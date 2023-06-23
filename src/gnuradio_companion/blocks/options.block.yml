@@ -36,7 +36,7 @@ parameters:
     dtype: enum
     default: dynamic
     options: [dynamic, static]
-    option_labels: [ Dynamic, Static ]
+    option_labels: [Dynamic, Static]
     hide: 'all'
 -   id: gen_cmake
     label: Generate CMakeLists.txt
