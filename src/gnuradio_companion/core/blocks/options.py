@@ -6,11 +6,12 @@
 
 from . import Block, register_build_in
 from ._build import build.params
+from ._templates import MakoTemplates
 
 @register_build_in
 class Options(Block):
    
-    Key = 'options'
+    key = 'options'
     label = 'options'
     flags = ['cpp', 'python']
 
@@ -20,22 +21,22 @@ class Options(Block):
                 dict(label='Title',
                      id='title',
                      dtype='string',
-                     hide=${ ('none' if title else 'part') }),
+                     hide="${ ('none' if title else 'part') }"),
 
                 dict(label='Author',
                      id='author',
                      dtype='string',
-                     hide=${ ('none' if author else 'part') }),
+                     hide="${ ('none' if author else 'part') }"),
                 
                 dict(label='Copyright',
                      id='copyright',
                      dtype='string',
-                     hide=${ ('none' if copyright else 'part') }),
+                     hide="${ ('none' if copyright else 'part') }"),
                 
                 dict(label='Description', 
                      id='description',
                      dtype='string',
-                     hide=${ ('none' if description else 'part') }),
+                     hide="${ ('none' if description else 'part') }"),
                 
                 dict(label='Output Language', 
                      id='output_language', 
@@ -63,38 +64,39 @@ class Options(Block):
                      dtype='enum',
                      default='On',
                      options=['On', 'Off'],
-                     hide=${ ('part' if output_language == 'cpp' else 'all') }),
+                     hide="${ ('part' if output_language == 'cpp' else 'all') }"),
 
                 dict(label='CMake options',
                      id='cmake_opt',
                      dtype='string',
                      default='',
-                     hide=${ ('part' if output_language == 'cpp' else 'all') }),
+                     hide="${ ('part' if output_language == 'cpp' else 'all') }"),
 
                 dict(label='Category',
                      id='category',
                      dtype='string',
                      default='[GRC Hier Blocks]',
-                     hide=${ ('none' if generate_options.startswith('hb') else 'all') }),
+                     hide="${ ('none' if generate_options.startswith('hb') else 'all') }"),
 
                 dict(label='Run Options',
                      id='run_options',
                      dtype='enum',
-                     default='prompt'
-                     options=['run', 'prompt']
-                     options),
+                     default='prompt',
+                     options=['run', 'prompt'],
+                     option_labels=['Run to Completion', 'Prompt for Exit'],
+                     hide="${ ('none' if generate_options == 'no_gui' else 'all') }"),
                 
                 dict(label='Widget Placement',
                      id='placement',
                      dtype='int_vector',
-                     default=[0,0]
-                     hide=${ ('part' if generate_options == 'bokeh_gui' else 'all') }),
+                     default=[0,0],
+                     hide="${ ('part' if generate_options == 'bokeh_gui' else 'all') }"),
 
                 dict(label='Window size',
                      id='window_size',
                      dtype='int_vector',
                      default=[1000,1000],
-                     hide=${ ('part' if generate_options == 'bokeh_gui' else 'all') }),
+                     hide="${ ('part' if generate_options == 'bokeh_gui' else 'all') }"),
 
                 dict(label='Sizing Mode',
                      id='sizing_mode',
@@ -102,7 +104,7 @@ class Options(Block):
                      default='fixed',
                      options=['fixed', 'stretch_both', 'scale_width', 'scale_height', 'scale_both'],
                      option_labels=['Fixed','Stretch Both','Scale Width','Scale Height', 'Scale Both'],
-                     hide=${ ('part' if generate_options == 'bokeh_gui' else 'all') }),
+                     hide="${ ('part' if generate_options == 'bokeh_gui' else 'all') }"),
 
                 dict(label='Run',
                      id='run',
@@ -110,25 +112,25 @@ class Options(Block):
                      default='True',
                      options=['True', 'False'],
                      option_labels=['Autostart', 'Off'],
-                     hide=${ ('all' if generate_options not in ('qt_gui', 'bokeh_gui') else ('part' if run else 'none')) }),
+                     hide="${ ('all' if generate_options not in ('qt_gui', 'bokeh_gui') else ('part' if run else 'none')) }"),
 
                 dict(label='Max Number of Output',
                      id='max_nouts',
                      dtype='int',
                      default='0',
-                     hide=${ ('all' if generate_options.startswith('hb') else ('none' if max_nouts else 'part')) }),
+                     hide="${ ('all' if generate_options.startswith('hb') else ('none' if max_nouts else 'part')) }"),
 
                 dict(label='Realtime Scheduling',
                      id='realtime_scheduling',
                      dtype='enum',
                      options=['', '1'],
                      option_labels=['Off', 'On'],
-                     hide=${ ('all' if generate_options.startswith('hb') else ('none' if realtime_scheduling else 'part')) }),
+                     hide="${ ('all' if generate_options.startswith('hb') else ('none' if realtime_scheduling else 'part')) }"),
 
                 dict(label='QSS Theme',
                      id='qt_qss_theme',
                      dtype='file_open',
-                     hide=${ ('all' if generate_options != 'qt_gui' else ('none' if qt_qss_theme else 'part')) }),
+                     hide="${ ('all' if generate_options != 'qt_gui' else ('none' if qt_qss_theme else 'part')) }"),
 
                 dict(label='Thread-safe setters',
                      id='thread_safe_setters',
@@ -152,7 +154,7 @@ class Options(Block):
                      category='Advanced',
                      dtype='string',
                      default='{python} -u {filename}',
-                     hide=${ ('all' if generate_options.startswith('hb') else 'part') }),
+                     hide="${ ('all' if generate_options.startswith('hb') else 'part') }"),
 
                 dict(label='Hier Block Source Path',
                      id='hier_block_src_path',
@@ -169,7 +171,11 @@ class Options(Block):
         if not (all(i>=0 for i in placement))
             self.add.error_message="placement cannot be below 0!"
     
-    cpp_templates=()
+    cpp_templates = cpp_templates or {}
+    cls.cpp_templates = MakoTemplates(
+        includes=cpp_templates.get('includes', []),
+    )
+    
     file_format=1
 
     
