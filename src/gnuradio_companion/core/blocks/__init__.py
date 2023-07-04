@@ -25,3 +25,4 @@ def register_build_in(cls):
 from .dummy import DummyBlock
 from .embedded_python import EPyBlock, EPyModule
 from .virtual import VirtualSink, VirtualSource
+from .options import Options

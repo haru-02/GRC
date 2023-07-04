@@ -5,8 +5,30 @@
 #
 
 from . import Block, register_build_in
-from ._build import build.params
+from ._build import build_params
 from ._templates import MakoTemplates
+from ._flags import Flags
+
+
+DOC="""
+The options block sets special parameters for the flow graph. Only one option block is allowed per flow graph.
+
+Title, author, and description parameters are for identification purposes.
+
+The window size controls the dimensions of the flow graph editor. The window size (width, height) must be between (300, 300) and (4096, 4096).
+
+The generate options controls the type of code generated. Non-graphical flow graphs should avoid using graphical sinks or graphical variable controls.
+
+In a graphical application, run can be controlled by a variable to start and stop the flowgraph at runtime.
+
+The id of this block determines the name of the generated file and the name of the class. For example, an id of my_block will generate the file my_block.py and class my_block(gr....
+
+The category parameter determines the placement of the block in the block selection window. The category only applies when creating hier blocks. To put hier blocks into the root category, enter / for the category.
+
+The Max Number of Output is the maximum number of output items allowed for any block in the flowgraph; to disable this set the max_nouts equal to 0.Use this to adjust the maximum latency a flowgraph can exhibit.
+"""
+
+templates = MakoTemplates()
 
 @register_build_in
 class Options(Block):
@@ -14,8 +36,9 @@ class Options(Block):
     key = 'options'
     label = 'options'
     flags = ['cpp', 'python']
+    documentation = {'': DOC}
 
-    parameters.data = build_params(
+    parameters_data = build_params(
             params_raw = [
                 
                 dict(label='Title',
@@ -163,19 +186,29 @@ class Options(Block):
                      default='.:',
                      hide='part')
                 ],
+            have_inputs=True,
+            have_outputs=True,
+            flags=Block.flags,
+            block_id=key
     )
 
-    def _run_asserts(self.parameters.data.placement):
+    def _run_asserts(placement):
         if not (len(placement) == 4 or len(placement) == 2):
             self.add.error_message="length of window placement must be 4 or 2 !"
-        if not (all(i>=0 for i in placement))
+        if not (all(i>=0 for i in placement)):
             self.add.error_message="placement cannot be below 0!"
     
-    cpp_templates = cpp_templates or {}
-    cls.cpp_templates = MakoTemplates(
-        includes=cpp_templates.get('includes', []),
-    )
-    
-    file_format=1
+        imports=templates.get('imports',"""from gnuradio import gr
+from gnuradio.filter import firdes
+from gnuradio.fft import window
+import sys
+import signal"""),
+    # callbacks='''if ${run}: self.start()
 
-    
+     #   else: self.stop(); self.wait()'''
+
+    cpp_templates = MakoTemplates(
+        includes=cpp_templates.get('includes', ['#include <gnuradio/topblock.h>']),
+    )
+
+    file_format=1 
