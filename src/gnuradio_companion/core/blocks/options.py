@@ -207,8 +207,16 @@ import signal"""),
 
      #   else: self.stop(); self.wait()'''
 
-    cpp_templates = MakoTemplates(
-        includes=cpp_templates.get('includes', ['#include <gnuradio/topblock.h>']),
-    )
+    cpp_templates = MakoTemplates(includes=['#include <gnuradio/topblock.h>'])
 
-    file_format=1 
+    file_format=1
+
+    def hide_bokeh_gui_options_if_not_installed(self)
+        try:
+            import bokehgui
+        except ImportError:
+            for param in self.parameters_data:
+                if param['id'] == 'generate_options':
+                    ind = param['options'].index('bokeh_gui')
+                    del param['options'][ind]
+                    del param['option_labels'][ind]
