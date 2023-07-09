@@ -211,7 +211,7 @@ import signal"""),
 
     file_format=1
 
-    def hide_bokeh_gui_options_if_not_installed(self)
+    def hide_bokeh_gui_options_if_not_installed(self):
         try:
             import bokehgui
         except ImportError:

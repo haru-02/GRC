@@ -24,6 +24,7 @@ from .io import yaml
 from .generator import Generator
 from .FlowGraph import FlowGraph
 from .Connection import Connection
+from .workflows import Workflows
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +49,7 @@ class Platform(Element):
         self.domains = {}
         self.connection_templates = {}
         self.cpp_connection_templates = {}
+        self.workflow = Workflows()
 
         self._block_categories = {}
         self._auto_hier_block_generate_chain = set()
@@ -141,6 +143,9 @@ class Platform(Element):
                 elif file_path.endswith('.tree.yml'):
                     loader = self.load_category_tree_description
                     scheme = None
+                elif file_path.endswith('.workflow.yml'):
+                    loader = self.workflows.load_workflow_description
+                    scheme = None
                 else:
                     continue
 
@@ -186,11 +191,7 @@ class Platform(Element):
             )
             errstr = "\n".join([errstr] + (path or self.config.block_paths))
             raise RuntimeError(errstr)
-        else:
-            # might have some cleanup to do on the options block in particular
-            utils.hide_bokeh_gui_options_if_not_installed(
-                self.blocks['options'])
-
+            
     def _iter_files_in_block_path(self, path=None, ext='yml'):
         """Iterator for block descriptions and category trees"""
         for entry in (path or self.config.block_paths):
