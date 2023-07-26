@@ -9,25 +9,6 @@ from ._build import build_params
 from ._templates import MakoTemplates
 from ._flags import Flags
 
-
-DOC="""
-The options block sets special parameters for the flow graph. Only one option block is allowed per flow graph.
-
-Title, author, and description parameters are for identification purposes.
-
-The window size controls the dimensions of the flow graph editor. The window size (width, height) must be between (300, 300) and (4096, 4096).
-
-The generate options controls the type of code generated. Non-graphical flow graphs should avoid using graphical sinks or graphical variable controls.
-
-In a graphical application, run can be controlled by a variable to start and stop the flowgraph at runtime.
-
-The id of this block determines the name of the generated file and the name of the class. For example, an id of my_block will generate the file my_block.py and class my_block(gr....
-
-The category parameter determines the placement of the block in the block selection window. The category only applies when creating hier blocks. To put hier blocks into the root category, enter / for the category.
-
-The Max Number of Output is the maximum number of output items allowed for any block in the flowgraph; to disable this set the max_nouts equal to 0.Use this to adjust the maximum latency a flowgraph can exhibit.
-"""
-
 templates = MakoTemplates()
 
 @register_build_in
@@ -36,11 +17,11 @@ class Options(Block):
     key = 'options'
     label = 'options'
     flags = ['cpp', 'python']
-    documentation = {'': DOC}
+    documentation = {'': WorkflowManager.doc}
 
     parameters_data = build_params(
             params_raw = [
-                
+               
                 dict(label='Title',
                      id='title',
                      dtype='string',
@@ -60,17 +41,26 @@ class Options(Block):
                      id='description',
                      dtype='string',
                      hide="${ ('none' if description else 'part') }"),
-                
-                dict(label='Output Language', 
-                     id='output_language', 
+
+                dict(label='Workflow', 
+                     id='workflow',
                      dtype='enum', 
-                     default='python', 
-                     options=['python', 'cpp'], 
-                     option_labels=['Python', 'C++']),
+                     default='python',
+                     # workflow labels and workflow ids should be populated in options option_labels
+                     options=[], 
+                     option_labels=[]),
+               
+               #  dict(label='Output Language', 
+               #       id='output_language',
+               #       dtype='enum', 
+               #       default='python', 
+               #       options=['python', 'cpp'], 
+               #       option_labels=['Python', 'C++']),
 
                 dict(label='Generate Options',
                      id='generate_options',
-                     dtype='enum', default='qt_gui',
+                     dtype='enum',
+                     default='qt_gui',
                      option=['qt_gui, bokeh_gui, no_gui, hb, hb_qt_gui'],
                      option_labels=['QT GUI, Bokeh GUI, No GUI, Heir Block, Heir Block (QT GUI)']),
 

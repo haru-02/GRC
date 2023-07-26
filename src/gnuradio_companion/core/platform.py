@@ -24,12 +24,15 @@ from .io import yaml
 from .generator import Generator
 from .FlowGraph import FlowGraph
 from .Connection import Connection
-from .workflows import Workflows
+from ..workflows import WorkflowManager
 
 logger = logging.getLogger(__name__)
 
 
 class Platform(Element):
+
+        block_id = data['id'] = data['id'].rstrip('_')
+
 
     def __init__(self, *args, **kwargs):
         """ Make a platform for GNU Radio """
@@ -144,7 +147,7 @@ class Platform(Element):
                     loader = self.load_category_tree_description
                     scheme = None
                 elif file_path.endswith('.workflow.yml'):
-                    loader = self.workflows.load_workflow_description
+                    loader = self.WorkflowManager.load_workflow_description
                     scheme = None
                 else:
                     continue
