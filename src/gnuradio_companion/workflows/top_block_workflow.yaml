@@ -28,7 +28,7 @@ The Max Number of Output is the maximum number of output items allowed for any b
         default: fixed
         options: [fixed, stretch_both, scale_width, scale_height, scale_both]
         option_labels: [Fixed, Stretch Both, Scale Width, Scale Height, Scale Both]
-        hide: ${ ('part' if generate_options == 'bokeh_gui' else 'all') }
+        hide: ${ ('part' if generate_options == 'bokeh_gui' else 'all') }      
     actions: 
         - label: Generate
           description: "generate the flowgraph"
