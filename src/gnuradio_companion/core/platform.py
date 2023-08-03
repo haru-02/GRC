@@ -24,15 +24,12 @@ from .io import yaml
 from .generator import Generator
 from .FlowGraph import FlowGraph
 from .Connection import Connection
-from ..workflows import WorkflowManager
+from ..workflows.workflow_manager import WorkflowManager
 
 logger = logging.getLogger(__name__)
 
 
-class Platform(Element):
-
-        block_id = data['id'] = data['id'].rstrip('_')
-
+class Platform(Element):    
 
     def __init__(self, *args, **kwargs):
         """ Make a platform for GNU Radio """
@@ -52,8 +49,7 @@ class Platform(Element):
         self.domains = {}
         self.connection_templates = {}
         self.cpp_connection_templates = {}
-        self.workflow = Workflows()
-
+        self.workflow = WorkflowManager()
         self._block_categories = {}
         self._auto_hier_block_generate_chain = set()
 
@@ -147,7 +143,7 @@ class Platform(Element):
                     loader = self.load_category_tree_description
                     scheme = None
                 elif file_path.endswith('.workflow.yml'):
-                    loader = self.WorkflowManager.load_workflow_description
+                    loader = self.workflow.load_workflow_description
                     scheme = None
                 else:
                     continue
@@ -221,7 +217,7 @@ class Platform(Element):
     ##############################################
     # Description File Loaders
     ##############################################
-    # region loaders
+    # regionloaders.
     def load_block_description(self, data, file_path):
         log = logger.getChild('block_loader')
 
