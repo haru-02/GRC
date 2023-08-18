@@ -15,15 +15,22 @@ templates = MakoTemplates()
 @register_build_in
 class Options(Block):
     
-    def __init__(self):
-        workflow_params = build_params(WorkflowManager.param_list[self.key], have_inputs=True, have_outputs=True, flags=Block.flags, block_id=self.key)
-        self.parameters.update(workflow_params) 
+    def __init__(self, parent):
+        super().__init__(parent)
+        #create parameter objects for all parameter data
+        #change the parameters based on workflow chosen once init runs.
+        workflow_params = build_params(self.parent_platform.workflow_manager.workflows.param_list[self.key], 
+                                       have_inputs=True, 
+                                       have_outputs=True, 
+                                       flags=Block.flags, 
+                                       block_id=self.key)
+        self.parameters.update(workflow_params)
         print(self.parameters.maps())
+        self.documentation = {'': WorkflowManager.workflows.docs[self.key]}
+        self.flags = WorkflowManager.workflows.flags[self.key]
 
     key = 'options'
     label = 'options'
-    flags = ['cpp', 'python']
-    documentation = {'': WorkflowManager.doc}
 
     parameters_data = build_params(
             params_raw = [
@@ -61,7 +68,7 @@ class Options(Block):
             block_id=key
     )
 
-    def _run_asserts(placement):
+    def _run_asserts(self, placement):
         if not (len(placement) == 4 or len(placement) == 2):
             self.add.error_message="length of window placement must be 4 or 2 !"
         if not (all(i>=0 for i in placement)):

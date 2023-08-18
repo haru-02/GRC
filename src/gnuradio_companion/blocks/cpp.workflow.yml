@@ -1,0 +1,149 @@
+workflow:
+
+    id: options
+    label: options
+    description: """
+The options block sets special parameters for the flow graph. Only one option block is allowed per flow graph.
+Title, author, and description parameters are for identification purposes.
+The window size controls the dimensions of the flow graph editor. The window size (width, height) must be between (300, 300) and (4096, 4096).
+The generate options controls the type of code generated. Non-graphical flow graphs should avoid using graphical sinks or graphical variable controls.
+In a graphical application, run can be controlled by a variable to start and stop the flowgraph at runtime.
+The id of this block determines the name of the generated file and the name of the class. For example, an id of my_block will generate the file my_block.py and class my_block(gr....
+The category parameter determines the placement of the block in the block selection window. The category only applies when creating hier blocks. To put hier blocks into the root category, enter / for the category.
+The Max Number of Output is the maximum number of output items allowed for any block in the flowgraph; to disable this set the max_nouts equal to 0.Use this to adjust the maximum latency a flowgraph can exhibit.
+"""
+    # parameters will contain the options form the options.block.yml.    
+    flags: [cpp]
+    parameters:   
+      - id : 'output_language',
+        label: 'Output Language', 
+        dtype: 'enum', 
+        default: 'cpp, 
+        options: ['cpp'], 
+        option_labels: ['C++'],
+
+      - id: 'generate_options',
+        label: 'Generate Options',
+        dtype: 'enum',
+        default: 'qt_gui',
+        option: ['qt_gui, no_gui, hb, hb_qt_gui'],
+        option_labels: ['QT GUI, No GUI, Heir Block, Heir Block (QT GUI)'],
+
+      - id: 'gen_linking',
+        label: 'Linking',
+        dtype: 'enum',
+        default: 'dynamic',
+        options: ['dynamic', 'static'],
+        options_labels: ['Dynamic', 'Static'],
+        hide: 'all',
+
+      - id: 'gen_cmake',
+        label: 'Generate CmakeLists.txt',
+        dtype: 'enum',
+        default: 'On',
+        options: ['On', 'Off'],
+        hide: 'part',
+
+      - id: 'cmake_opt',
+        label: 'CMake options',
+        dtype: 'string',
+        default: '',
+        hide: 'part',
+
+      - id: 'category',
+        label: 'Category',
+        dtype: 'string',
+        default: '[GRC Hier Blocks]',
+        hide: ${ ('none' if generate_options.startswith('hb') else 'all') },
+
+      - id: 'run_options',
+        label: 'Run Options',
+        dtype: 'enum',
+        default: 'prompt',
+        options: ['run', 'prompt'],
+        option_labels: ['Run to Completion', 'Prompt for Exit'],
+        hide: ${ ('none' if generate_options == 'no_gui' else 'all') },
+                
+      - id: 'placement',
+        label: 'Widget Placement',
+        dtype: 'int_vector',
+        default: [0,0],
+        hide: 'all',
+
+      - id: 'window_size',
+        label: 'Window size',
+        dtype: 'int_vector',
+        default: [1000,1000],
+        hide: 'all',
+
+      - id: 'sizing_mode',
+        label: 'Sizing Mode',
+        dtype: 'enum',
+        default: 'fixed',
+        options: ['fixed', 'stretch_both', 'scale_width', 'scale_height', 'scale_both'],
+        option_labels: ['Fixed','Stretch Both','Scale Width','Scale Height', 'Scale Both'],
+        hide: 'all',
+
+      - id: 'run',
+        label: 'Run',
+        dtype: 'bool',
+        default: 'True',
+        options: ['True', 'False'],
+        option_labels: ['Autostart', 'Off'],
+        hide: ${ ('all' if generate_options not in ('qt_gui', 'bokeh_gui') else ('part' if run else 'none')) },
+
+      - id: 'max_nouts',
+        label: 'Max Number of Output',
+        dtype: 'int',
+        default: '0',
+        hide: ${ ('all' if generate_options.startswith('hb') else ('none' if max_nouts else 'part')) },
+
+      - id: 'realtime_scheduling',
+        label: 'Realtime Scheduling',
+        dtype: 'enum',
+        options: ['', '1'],
+        option_labels: ['Off', 'On'],
+        hide: ${ ('all' if generate_options.startswith('hb') else ('none' if realtime_scheduling else 'part')) },
+
+      - id: 'qt_qss_theme',
+        label: 'QSS Theme',
+        dtype: 'file_open',
+        hide: ${ ('all' if generate_options != 'qt_gui' else ('none' if qt_qss_theme else 'part')) },
+
+      - id: 'thread_safe_setters',
+        label: 'Thread-safe setters',
+        category: 'Advanced',
+        dtype: 'enum',
+        options: ['','1'],
+        option_labels: ['Off', 'On'],
+        hide: 'part',
+
+      - id: 'catch_exceptions',
+        label: 'Catch Block Exceptions',
+        category: 'Advanced',
+        dtype: 'enum',
+        options: ['False', 'True'],
+        option_labels: ['Off', 'On'],
+        default: 'True',
+        hide: 'part',
+
+      - id: 'run_command',
+        label: 'Run Command',
+        category: 'Advanced',
+        dtype: 'string',
+        default: '{python} -u {filename}',
+        hide: ${ ('all' if generate_options.startswith('hb') else 'part') },
+
+      - id: 'hier_block_src_path',
+        label: 'Hier Block Source Path',
+        category: 'Advanced',
+        dtype: 'string',
+        default: '.:',
+        hide: 'part',  
+    actions: 
+        - label: Generate
+          description: "generate the flowgraph"
+          method: generate
+        - label: Run
+        - label: Kill
+    entrypoint: gnuradio_companion.workflows.top_block:Generator

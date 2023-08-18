@@ -49,7 +49,7 @@ class Platform(Element):
         self.domains = {}
         self.connection_templates = {}
         self.cpp_connection_templates = {}
-        self.workflow = WorkflowManager()
+        self.workflow_manager = WorkflowManager()
         self._block_categories = {}
         self._auto_hier_block_generate_chain = set()
 
@@ -143,7 +143,7 @@ class Platform(Element):
                     loader = self.load_category_tree_description
                     scheme = None
                 elif file_path.endswith('.workflow.yml'):
-                    loader = self.workflow.load_workflow_description
+                    loader = self.workflow_manager.load_workflow_description
                     scheme = None
                 else:
                     continue
