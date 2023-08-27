@@ -7,9 +7,7 @@
 from . import Block, register_build_in
 from ._build import build_params
 from ._templates import MakoTemplates
-from ._flags import Flags
 from ...workflows.workflow_manager import WorkflowManager
-from collections import ChainMap
 
 templates = MakoTemplates()
 
@@ -18,35 +16,15 @@ class Options(Block):
     
     def __init__(self, parent):
         super().__init__(parent)
-        
-        self.workflows = self.parent_platform.workflow_manager.workflows
-        self.workflow_labels = self.workflows.workflow_labels
-        self.workflow_ids = self.workflows.workflow_ids
-        self. workflow_params = ChainMap()
-        
-        for i in self.workflow_ids:
-            params = build_params(self.workflows.param_list[i],
-                                  have_inputs=True,
-                                  have_outputs=True,
-                                  flags=Block.flags,
-                                  block_id=self.key)
-            #the parameters will have the problem of shadowing. keep them separate.
-            self.workflow_params = self.workflow_params.new_child({i : params})
-        
-        #create parameter objects for all parameter data
-        #change the parameters based on workflow chosen once init runs.
-        # workflow_params = build_params(self.parent_platform.workflow_manager.workflows.param_list[self.key], 
-        #                                have_inputs=True, 
-        #                                have_outputs=True, 
-        #                                flags=Block.flags, 
-        #                                block_id=self.key)
-        # self.parameters.update(workflow_params)
-        # print(self.parameters.maps())
-
-        self.parameters_data['workflow']['options'] = self.workflow_ids
-        self.parameters_data['workflow']['option_labels'] = self.workflow_labels
-        self.documentation = {'': self.workflows.docs[self.key]}
-        self.flags = self.workflows.flags[self.key]
+        workflow_params = build_params(self.parent_platform.workflows.param_list[self.key], 
+                                       have_inputs=True, 
+                                       have_outputs=True, 
+                                       flags=Block.flags, 
+                                       block_id=self.key)
+        self.parameters.update(workflow_params)
+        print(self.parameters.maps())
+        self.documentation = {'': WorkflowManager.workflows.docs[self.key]}
+        self.flags = WorkflowManager.workflows.flags[self.key]
 
     key = 'options'
     label = 'options'
@@ -98,10 +76,7 @@ from gnuradio.filter import firdes
 from gnuradio.fft import window
 import sys
 import signal"""),
-    # callbacks='''if ${run}: self.start()
-
-     #   else: self.stop(); self.wait()'''
-
+    
     cpp_templates = MakoTemplates(includes=['#include <gnuradio/topblock.h>'])
 
     file_format=1
