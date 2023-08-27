@@ -24,13 +24,13 @@ class Options(Block):
         self.workflow_ids = self.workflows.workflow_ids
         self. workflow_params = ChainMap()
         
-        for i in self.workflow_labels:
+        for i in self.workflow_ids:
             params = build_params(self.workflows.param_list[i],
                                   have_inputs=True,
                                   have_outputs=True,
                                   flags=Block.flags,
                                   block_id=self.key)
-            
+            #the parameters will have the problem of shadowing. keep them separate.
             self.workflow_params = self.workflow_params.new_child({i : params})
         
         #create parameter objects for all parameter data
@@ -42,7 +42,7 @@ class Options(Block):
         #                                block_id=self.key)
         # self.parameters.update(workflow_params)
         # print(self.parameters.maps())
-        
+
         self.parameters_data['workflow']['options'] = self.workflow_ids
         self.parameters_data['workflow']['option_labels'] = self.workflow_labels
         self.documentation = {'': self.workflows.docs[self.key]}

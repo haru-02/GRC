@@ -22,12 +22,3 @@ class WorkflowManager():
             self.workflows.docs[data['id']] = data['description']
             self.workflows.flags[data['id']] = data['flags']
             self.workflows.param_list[data['id']] = data['parameters']
-
-        # old code (remove later)    
-        # self.doc = data['description']
-        # self.flags = data['flags']
-        # new_param = {workflow_id: data['parameters']}
-        # self.param_list = self.param_list.new_child(new_param)
-
-        # write a class called workflow that stores all the info you get from
-        # different .yml files into a single dictionary.
